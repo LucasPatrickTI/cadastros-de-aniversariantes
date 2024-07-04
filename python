@@ -1,0 +1,719 @@
+import pywhatkit 
+
+from time import sleep 
+
+import pyautogui 
+
+from datetime import datetime 
+
+ 
+
+contatos =  [] 
+
+ 
+
+mensagem = """ 
+
+*OLÁ!!* 👋🏻👨🏻‍🦳 
+
+ 
+
+_*SEU ANIVERSÁRIO ESTA CHEGANDO, VENHA CELEBRAR CONOSCO*_ ‼️ 
+
+💃🏼🪩🕺🏼💃🏼🪩🕺🏼💃🏼🪩🕺🏼💃🏼🪩🕺🏼💃🏼🪩🕺🏼💃🏼🪩🕺🏼 
+
+ 
+
+*OFERECEMOS MUITAS VANTAGENS PARA VOCÊ E SEUS AMIGOS!!* 
+
+🎉🎊🎉🎊🎉🎊🎉🎊🎉🎊 
+
+ 
+
+*AQUI ESTÁ NOSSO SITE* 
+
+ 
+
+_velhopietro.com_ 
+
+ 
+
+*SIGA A GENTE NO INSTAGRAM* 
+
+ 
+
+📸 - _https://www.instagram.com/velhopietro?igsh=ZHM1MDV3aXU0bHk3_ 
+
+ 
+
+*SALVE NOSSO CONTATO PARA ENVIARMOS À PROGRAMAÇÃO DIRETAMENTE PARA VOCÊ.* 
+
+""" 
+
+ 
+
+while len(contatos) >= 1: 
+
+    try: 
+
+        pywhatkit.sendwhatmsg(contatos[0], (mensagem), 
+
+        datetime.now().hour, datetime.now().minute + 2) 
+
+        del contatos[0] 
+
+        sleep(60) 
+
+        pyautogui.hotkey('ENTER') 
+
+        sleep(10) 
+
+        pyautogui.hotkey('ctrl','w') 
+
+    except: 
+
+        print(f'nao foi possivel enviar a mensagem para o {contatos}') 
+
+ 
+
+pyautogui.hotkey('ctrl','w') 
+
+ 
+
+         
+
+ 
+
+ 
+
+ 
+
+    # OLA!! 
+
+    # SEU ANIVERSAIRO ESTA CHEGANDO, VENHA CELEBRAR CONOSCO!! 
+
+    # OFEREMOS MUITA VANTAGENS PARA VOCÊ SEUS AMIGOS!! 
+
+    # 🎉🎊🎉🎊🎉🎊🎉🎊🎉🎊 
+
+    # 
+
+ 
+
+ 
+
+ 
+
+ 
+
+Cadastro 
+
+import tkinter as tk 
+
+from tkinter import ttk, messagebox, filedialog 
+
+import sqlite3 
+
+import openpyxl 
+
+ 
+
+# Função para converter número do mês para nome do mês em português 
+
+def numero_para_nome_mes(numero): 
+
+    meses = { 
+
+        1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril', 
+
+        5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto', 
+
+        9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro' 
+
+    } 
+
+    return meses[numero] 
+
+ 
+
+# Função para criar a tabela de aniversariantes no banco de dados SQLite 
+
+def criar_tabela(): 
+
+    conn = sqlite3.connect('aniversariantes.db') 
+
+    cursor = conn.cursor() 
+
+    cursor.execute('''CREATE TABLE IF NOT EXISTS aniversariantes ( 
+
+                        id INTEGER PRIMARY KEY AUTOINCREMENT, 
+
+                        nome TEXT, 
+
+                        data TEXT, 
+
+                        telefone TEXT 
+
+                    )''') 
+
+    conn.commit() 
+
+    conn.close() 
+
+ 
+
+# Função para cadastrar um novo aniversariante no banco de dados SQLite 
+
+def cadastrar_aniversariante(event=None): 
+
+    nome = entry_nome.get() 
+
+    data = entry_data.get() 
+
+    telefone = entry_telefone.get() 
+
+ 
+
+    if nome.strip() and data.strip() and telefone.strip(): 
+
+        conn = sqlite3.connect('aniversariantes.db') 
+
+        cursor = conn.cursor() 
+
+        cursor.execute('INSERT INTO aniversariantes (nome, data, telefone) VALUES (?, ?, ?)', (nome, data, telefone)) 
+
+        conn.commit() 
+
+        conn.close() 
+
+        atualizar_lista() 
+
+        entry_nome.delete(0, tk.END) 
+
+        entry_data.delete(0, tk.END) 
+
+        entry_telefone.delete(0, tk.END) 
+
+        entry_nome.focus_set()  # Focar na próxima entrada de nome 
+
+        messagebox.showinfo("Novo Cadastro", "Aniversariante cadastrado com sucesso!") 
+
+    else: 
+
+        messagebox.showwarning("Erro", "Por favor, preencha todos os campos.") 
+
+ 
+
+# Função para formatar a data com barras (DD/MM/AAAA) 
+
+def formatar_data(event): 
+
+    data = entry_data.get() 
+
+    if len(data) == 2 or len(data) == 5: 
+
+        entry_data.insert(tk.END, '/') 
+
+    elif len(data) == 10: 
+
+        entry_telefone.focus_set() 
+
+ 
+
+# Função para mudar o foco para o campo de data após pressionar Enter no campo de nome 
+
+def mudar_para_data(event): 
+
+    entry_data.focus_set() 
+
+ 
+
+# Função para mudar o foco para o campo de telefone após pressionar Enter no campo de data 
+
+def mudar_para_telefone(event): 
+
+    entry_telefone.focus_set() 
+
+ 
+
+# Função para mudar o foco para o botão de cadastro após pressionar Enter no campo de telefone 
+
+def mudar_para_cadastrar(event): 
+
+    cadastrar_aniversariante() 
+
+ 
+
+# Função para exibir todos os aniversariantes cadastrados 
+
+def exibir_aniversariantes(): 
+
+    conn = sqlite3.connect('aniversariantes.db') 
+
+    cursor = conn.cursor() 
+
+    cursor.execute('SELECT * FROM aniversariantes') 
+
+    dados = cursor.fetchall() 
+
+    conn.close() 
+
+ 
+
+    lista_aniversariantes = [] 
+
+    if not dados: 
+
+        lista_aniversariantes.append("Nenhum aniversariante cadastrado.") 
+
+    else: 
+
+        for dado in dados: 
+
+            id_aniversariante = dado[0] 
+
+            nome = dado[1] 
+
+            data = dado[2] 
+
+            telefone = dado[3] 
+
+             
+
+            # Verifica se a data está no formato correto (DD/MM/AAAA) 
+
+            if '/' in data: 
+
+                try: 
+
+                    dia, mes, ano = map(int, data.split('/')) 
+
+                    if 1 <= mes <= 12: 
+
+                        nome_mes = numero_para_nome_mes(mes) 
+
+                        lista_aniversariantes.append(f"{id_aniversariante} - {nome_mes} {dia} - {nome} - {telefone}") 
+
+                    else: 
+
+                        lista_aniversariantes.append(f"{id_aniversariante} - Data inválida - {nome} - {telefone}") 
+
+                except ValueError: 
+
+                    lista_aniversariantes.append(f"{id_aniversariante} - Data inválida - {nome} - {telefone}") 
+
+            else: 
+
+                lista_aniversariantes.append(f"{id_aniversariante} - Data inválida - {nome} - {telefone}") 
+
+    return lista_aniversariantes 
+
+ 
+
+# Função para atualizar a lista de aniversariantes na janela 
+
+def atualizar_lista(): 
+
+    lista_aniversariantes.delete(0, tk.END) 
+
+    for aniversariante in exibir_aniversariantes(): 
+
+        lista_aniversariantes.insert(tk.END, aniversariante) 
+
+ 
+
+# Função para excluir o aniversariante selecionado 
+
+def excluir_aniversariante(): 
+
+    try: 
+
+        indice_selecionado = lista_aniversariantes.curselection()[0] 
+
+        dados_selecionados = lista_aniversariantes.get(indice_selecionado) 
+
+        id_aniversariante, _, _, _ = dados_selecionados.split(' - ') 
+
+         
+
+        conn = sqlite3.connect('aniversariantes.db') 
+
+        cursor = conn.cursor() 
+
+        cursor.execute('DELETE FROM aniversariantes WHERE id = ?', (id_aniversariante,)) 
+
+        conn.commit() 
+
+        conn.close() 
+
+        atualizar_lista() 
+
+        messagebox.showinfo("Exclusão", "Aniversariante excluído com sucesso!") 
+
+    except IndexError: 
+
+        messagebox.showwarning("Erro", "Por favor, selecione um aniversariante na lista.") 
+
+ 
+
+# Função para abrir janela de alteração de dados 
+
+def abrir_janela_alterar(): 
+
+    try: 
+
+        indice_selecionado = lista_aniversariantes.curselection()[0] 
+
+        dados_selecionados = lista_aniversariantes.get(indice_selecionado) 
+
+        id_aniversariante, _, _, _ = dados_selecionados.split(' - ') 
+
+         
+
+        janela_alterar = tk.Toplevel() 
+
+        janela_alterar.title("Alterar Dados do Aniversariante") 
+
+         
+
+        label_nome = ttk.Label(janela_alterar, text="Nome:") 
+
+        label_nome.grid(row=0, column=0, padx=5, pady=5) 
+
+        entry_nome = ttk.Entry(janela_alterar) 
+
+        entry_nome.grid(row=0, column=1, padx=5, pady=5) 
+
+         
+
+        label_data = ttk.Label(janela_alterar, text="Data de Nascimento (DD/MM/AAAA):") 
+
+        label_data.grid(row=1, column=0, padx=5, pady=5) 
+
+        entry_data = ttk.Entry(janela_alterar) 
+
+        entry_data.grid(row=1, column=1, padx=5, pady=5) 
+
+         
+
+        label_telefone = ttk.Label(janela_alterar, text="Telefone:") 
+
+        label_telefone.grid(row=2, column=0, padx=5, pady=5) 
+
+        entry_telefone = ttk.Entry(janela_alterar) 
+
+        entry_telefone.grid(row=2, column=1, padx=5, pady=5) 
+
+         
+
+        botao_salvar = ttk.Button(janela_alterar, text="Salvar", command=lambda: salvar_alteracoes(id_aniversariante, entry_nome.get(), entry_data.get(), entry_telefone.get(), janela_alterar)) 
+
+        botao_salvar.grid(row=3, columnspan=2, padx=5, pady=5) 
+
+         
+
+        # Preenche os campos com os dados atuais 
+
+        conn = sqlite3.connect('aniversariantes.db') 
+
+        cursor = conn.cursor() 
+
+        cursor.execute('SELECT * FROM aniversariantes WHERE id = ?', (id_aniversariante,)) 
+
+        dados_aniversariante = cursor.fetchone() 
+
+        conn.close() 
+
+         
+
+        if dados_aniversariante: 
+
+            entry_nome.insert(0, dados_aniversariante[1]) 
+
+            entry_data.insert(0, dados_aniversariante[2]) 
+
+            entry_telefone.insert(0, dados_aniversariante[3]) 
+
+         
+
+    except IndexError: 
+
+        messagebox.showwarning("Erro", "Por favor, selecione um aniversariante na lista.") 
+
+ 
+
+# Função para salvar as alterações dos dados do aniversariante 
+
+def salvar_alteracoes(id_aniversariante, nome, data, telefone, janela_alterar): 
+
+    if nome.strip() and data.strip() and telefone.strip(): 
+
+        conn = sqlite3.connect('aniversariantes.db') 
+
+        cursor = conn.cursor() 
+
+        cursor.execute('UPDATE aniversariantes SET nome=?, data=?, telefone=? WHERE id=?', (nome, data, telefone, id_aniversariante)) 
+
+        conn.commit() 
+
+        conn.close() 
+
+        atualizar_lista() 
+
+        janela_alterar.destroy()  # Fecha a janela de alteração após salvar as alterações 
+
+        messagebox.showinfo("Alteração", "Dados do aniversariante atualizados com sucesso!") 
+
+    else: 
+
+        messagebox.showwarning("Erro", "Por favor, preencha todos os campos.") 
+
+ 
+
+# Função para limpar o histórico de clientes cadastrados 
+
+def limpar_historico(): 
+
+    resposta = messagebox.askyesno("Limpar Histórico", "Tem certeza de que deseja limpar todo o histórico de clientes cadastrados?") 
+
+    if resposta: 
+
+        conn = sqlite3.connect('aniversariantes.db') 
+
+        cursor = conn.cursor() 
+
+        cursor.execute('DELETE FROM aniversariantes') 
+
+        conn.commit() 
+
+        conn.close() 
+
+        atualizar_lista()  # Atualiza a lista após limpar o histórico 
+
+        messagebox.showinfo("Histórico Limpo", "O histórico de clientes cadastrados foi limpo com sucesso!") 
+
+ 
+
+# Função para salvar os clientes cadastrados em um arquivo Excel 
+
+def salvar_clientes(): 
+
+    try: 
+
+        clientes = exibir_aniversariantes() 
+
+        nome_arquivo = filedialog.asksaveasfilename(defaultextension=".xlsx", filetypes=[("Arquivos do Excel", "*.xlsx")]) 
+
+        if nome_arquivo: 
+
+            wb = openpyxl.Workbook() 
+
+            ws = wb.active 
+
+            ws.title = "Aniversariantes" 
+
+             
+
+            # Escreve os dados na planilha 
+
+            for idx, cliente in enumerate(clientes, start=1): 
+
+                ws[f'A{idx}'] = cliente 
+
+             
+
+            wb.save(nome_arquivo) 
+
+            messagebox.showinfo("Clientes Salvos", "Os clientes cadastrados foram salvos com sucesso!") 
+
+    except Exception as e: 
+
+        messagebox.showerror("Erro", f"Ocorreu um erro ao salvar os clientes: {str(e)}") 
+
+ 
+
+# Função para configurar o número de clientes de ID 
+
+def configurar_numero_clientes(novo_numero): 
+
+    conn = sqlite3.connect('aniversariantes.db') 
+
+    cursor = conn.cursor() 
+
+ 
+
+    # Verifica se o novo número é válido (inteiro positivo) 
+
+    if isinstance(novo_numero, int) and novo_numero > 0: 
+
+        cursor.execute('SELECT COUNT(*) FROM aniversariantes') 
+
+        numero_clientes_atual = cursor.fetchone()[0] 
+
+ 
+
+        if novo_numero < numero_clientes_atual: 
+
+            messagebox.showwarning("Aviso", f"O novo número de clientes ({novo_numero}) é menor que o número atual de clientes ({numero_clientes_atual}).") 
+
+        else: 
+
+            # Atualiza o número de clientes 
+
+            cursor.execute('UPDATE SQLITE_SEQUENCE SET seq=? WHERE name=?', (novo_numero-1, 'aniversariantes')) 
+
+            conn.commit() 
+
+            messagebox.showinfo("Sucesso", f"O número de clientes foi configurado para {novo_numero}.") 
+
+    else: 
+
+        messagebox.showwarning("Erro", "Por favor, insira um número inteiro positivo.") 
+
+ 
+
+    conn.close() 
+
+ 
+
+# Função para zerar a configuração do número de clientes de ID 
+
+def zerar_configuracao(): 
+
+    conn = sqlite3.connect('aniversariantes.db') 
+
+    cursor = conn.cursor() 
+
+    cursor.execute('UPDATE SQLITE_SEQUENCE SET seq=0 WHERE name=?', ('aniversariantes',)) 
+
+    conn.commit() 
+
+    conn.close() 
+
+    messagebox.showinfo("Sucesso", "A configuração do número de clientes foi zerada.") 
+
+ 
+
+# Criar a tabela no banco de dados SQLite 
+
+criar_tabela() 
+
+ 
+
+# Criando a janela principal 
+
+root = tk.Tk() 
+
+root.title("Cadastro de Aniversariantes") 
+
+ 
+
+# Entradas de texto e rótulos para o nome, data e telefone do aniversariante 
+
+label_nome = ttk.Label(root, text="Nome Completo:") 
+
+label_nome.grid(row=0, column=0, padx=5, pady=5) 
+
+entry_nome = ttk.Entry(root) 
+
+entry_nome.grid(row=0, column=1, padx=5, pady=5) 
+
+entry_nome.focus_set() 
+
+entry_nome.bind('<Return>', mudar_para_data)  # Pressionar Enter para mudar para o campo de data 
+
+ 
+
+label_data = ttk.Label(root, text="Data de Nascimento (DD/MM/AAAA):") 
+
+label_data.grid(row=1, column=0, padx=5, pady=5) 
+
+entry_data = ttk.Entry(root) 
+
+entry_data.grid(row=1, column=1, padx=5, pady=5) 
+
+entry_data.bind('<KeyRelease>', formatar_data)  # Atualiza a formatação da data enquanto o usuário digita 
+
+entry_data.bind('<Return>', mudar_para_telefone)  # Pressionar Enter para mudar para o campo de telefone 
+
+ 
+
+label_telefone = ttk.Label(root, text="Telefone:") 
+
+label_telefone.grid(row=2, column=0, padx=5, pady=5) 
+
+entry_telefone = ttk.Entry(root) 
+
+entry_telefone.grid(row=2, column=1, padx=5, pady=5) 
+
+entry_telefone.bind('<Return>', mudar_para_cadastrar)  # Pressionar Enter para cadastrar o aniversariante 
+
+ 
+
+# Botão para cadastrar novo aniversariante 
+
+botao_cadastrar = ttk.Button(root, text="Cadastrar", command=cadastrar_aniversariante) 
+
+botao_cadastrar.grid(row=3, columnspan=2, padx=5, pady=5) 
+
+ 
+
+# Botão para excluir aniversariante selecionado 
+
+botao_excluir = ttk.Button(root, text="Excluir", command=excluir_aniversariante) 
+
+botao_excluir.grid(row=4, columnspan=2, padx=5, pady=5) 
+
+ 
+
+# Botão para alterar aniversariante selecionado 
+
+botao_alterar = ttk.Button(root, text="Alterar", command=abrir_janela_alterar) 
+
+botao_alterar.grid(row=5, columnspan=2, padx=5, pady=5) 
+
+ 
+
+# Lista para exibir aniversariantes 
+
+lista_aniversariantes = tk.Listbox(root, height=15, width=50)  # Aumenta o tamanho do Listbox 
+
+lista_aniversariantes.grid(row=6, columnspan=2, padx=5, pady=5) 
+
+ 
+
+# Botão para limpar o histórico de clientes cadastrados 
+
+botao_limpar_historico = ttk.Button(root, text="Limpar Histórico", command=limpar_historico) 
+
+botao_limpar_historico.grid(row=7, columnspan=2, padx=5, pady=5) 
+
+ 
+
+# Botão para salvar os clientes cadastrados 
+
+botao_salvar_clientes = ttk.Button(root, text="Salvar Clientes", command=salvar_clientes) 
+
+botao_salvar_clientes.grid(row=8, columnspan=2, padx=5, pady=5) 
+
+ 
+
+# Botão para zerar a configuração do número de clientes de ID 
+
+botao_zerar_configuracao = ttk.Button(root, text="Zerar Configuração", command=zerar_configuracao) 
+
+botao_zerar_configuracao.grid(row=9, columnspan=2, padx=5, pady=5) 
+
+ 
+
+# Atualiza a lista de aniversariantes na inicialização 
+
+atualizar_lista() 
+
+ 
+
+root.mainloop() 
+
+ 
+
+ 
